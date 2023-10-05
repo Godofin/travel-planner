@@ -1,33 +1,31 @@
-# Etapa de construção
-FROM golang:1.17 as builder
+# Etapa base para compilar o código Go
+FROM golang:1.18.2-alpine3.16 as base
 
-# Definir a pasta de trabalho no container
-WORKDIR /app
+# Atualizar o index do pacote e definir o diretório de trabalho
+RUN apk update
+WORKDIR /src/api
 
-# Copiar go mod e sum files
+# Copiar os arquivos go.mod e go.sum e instalar as dependências
 COPY go.mod go.sum ./
-
-# Baixar todas as dependências
 RUN go mod download
 
-# Copiar o código fonte do aplicativo para o container
+# Copiar o restante dos arquivos para o container
 COPY . .
 
-# Construir o aplicativo
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Compilar o aplicativo
+RUN go build -o api ./main.go
 
-# Etapa de execução
-FROM alpine:latest
+# Etapa para criar a imagem final
+FROM alpine:3.16 as binary
 
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
-
-# Copiar o binário pré-construído do estágio anterior
-COPY --from=builder /app/main .
+# Copiar o binário compilado e outros arquivos necessários da etapa anterior
+COPY --from=base /src/api/api .
+# Se você tiver outros arquivos ou pastas que precisam ser copiados para a imagem, inclua-os aqui.
+# Por exemplo, se você tiver uma pasta 'web', descomente a próxima linha.
+# COPY --from=base /src/api/web ./web
 
 # Expor a porta na qual o app vai rodar
-EXPOSE 8080
+EXPOSE 3000
 
 # Comando para executar o binário
-CMD ["./main"]
+CMD ["./api"]
