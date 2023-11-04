@@ -6,23 +6,35 @@ import (
 	c_destination "github.com/Godofin/travel-planner/controller"
 	c_itinerary "github.com/Godofin/travel-planner/controller"
 	c_users "github.com/Godofin/travel-planner/controller"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func HandleRequest() {
 	r := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://127.0.0.1:5500"}                     // Troque para sua origem necessária, use * para permitir todas
+	config.AllowMethods = []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"} // HTTP methods your API supports
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
+
+	r.Use(cors.New(config))
 	//Users
 	r.GET("/users", c_users.ReadUsers)
 	r.GET("/users/:id", c_users.ReadUserById)
 	r.POST("/users", c_users.CreateUser)
 	r.DELETE("/users/:id", c_users.DeleteById)
 	r.PATCH("/users/:id", c_users.EditUser)
-	//Itnerary
-	r.GET("/itnerary", c_itinerary.ReadItinerary)
-	r.GET("/itnerary/:id", c_itinerary.ReadItineraryById)
-	r.POST("/itnerary", c_itinerary.CreateItinerary)
-	r.DELETE("/itnerary/:id", c_itinerary.DeleteByIditinerary)
-	r.PATCH("/itnerary/:id", c_itinerary.EditItinerary)
+	itineraries := r.Group("/itinerary")
+	// Aplicar configurações CORS a este grupo de rotas
+	itineraries.Use(cors.New(config))
+	{
+		itineraries.GET("", c_itinerary.ReadItinerary)
+		itineraries.GET("/:id", c_itinerary.ReadItineraryById)
+		itineraries.POST("", c_itinerary.CreateItinerary)
+		itineraries.DELETE("/:id", c_itinerary.DeleteByIditinerary)
+		itineraries.PATCH("/:id", c_itinerary.EditItinerary)
+	}
 	//Itnerary details
 	r.GET("/itnerarydetails", c_itinerary.ReadItineraryDetails)
 	r.GET("/itnerarydetails/:id", c_itinerary.ReadItineraryDetailsById)
