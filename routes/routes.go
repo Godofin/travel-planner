@@ -14,7 +14,7 @@ func HandleRequest() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:5500"}                     // Troque para sua origem necessária, use * para permitir todas
+	config.AllowOrigins = []string{"https://travelplanner-phi.vercel.app"}      // Troque para sua origem necessária, use * para permitir todas
 	config.AllowMethods = []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"} // HTTP methods your API supports
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
 
