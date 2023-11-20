@@ -14,5 +14,6 @@ type Itinerary struct {
 	End_Date    time.Time `json:"end_date"`
 	Destination string    `json:"destination"`
 	Activity    string    `json:"activities"`
+	Image       string    `json:"image"`
 	User_Id     string    `json:"user_id"`
 }
